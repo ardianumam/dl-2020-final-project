@@ -1,0 +1,6 @@
+model
+/model
+Trail_dataset
+Trail_dataset/
+__pycache__
+.idea
