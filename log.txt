@@ -1104,12 +1104,341 @@ Test acc iter-120: 89%
 Epoch-46, iter-130 --> loss: 0.059
 Epoch-46, iter-140 --> loss: 0.039
 Model in 46 is stored.
-Epoch-47, iter-10 --> loss: 0.034
-Epoch-47, iter-20 --> loss: 0.056
-Epoch-47, iter-30 --> loss: 0.037
-Epoch-47, iter-40 --> loss: 0.057
+Last resumed epoch: 46
+Last resumed model loss: 0.05653235644193275
+Epoch-47, iter-10 --> loss: 0.052
+Epoch-47, iter-20 --> loss: 0.071
+Epoch-47, iter-30 --> loss: 0.036
+Epoch-47, iter-40 --> loss: 0.030
 --------------------------------
 Test acc iter-40: 89%
 --------------------------------
-Epoch-47, iter-50 --> loss: 0.048
-Epoch-47, iter-60 --> loss: 0.024
+Epoch-47, iter-50 --> loss: 0.067
+Epoch-47, iter-60 --> loss: 0.041
+Epoch-47, iter-70 --> loss: 0.072
+Epoch-47, iter-80 --> loss: 0.086
+--------------------------------
+Test acc iter-80: 88%
+--------------------------------
+Epoch-47, iter-90 --> loss: 0.051
+Epoch-47, iter-100 --> loss: 0.061
+Epoch-47, iter-110 --> loss: 0.077
+Epoch-47, iter-120 --> loss: 0.064
+--------------------------------
+Test acc iter-120: 88%
+--------------------------------
+Epoch-47, iter-130 --> loss: 0.068
+Epoch-47, iter-140 --> loss: 0.059
+Model in 47 is stored.
+Epoch-48, iter-10 --> loss: 0.053
+Epoch-48, iter-20 --> loss: 0.047
+Epoch-48, iter-30 --> loss: 0.046
+Epoch-48, iter-40 --> loss: 0.049
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-48, iter-50 --> loss: 0.072
+Epoch-48, iter-60 --> loss: 0.036
+Epoch-48, iter-70 --> loss: 0.081
+Epoch-48, iter-80 --> loss: 0.075
+--------------------------------
+Test acc iter-80: 88%
+--------------------------------
+Epoch-48, iter-90 --> loss: 0.052
+Epoch-48, iter-100 --> loss: 0.048
+Epoch-48, iter-110 --> loss: 0.063
+Epoch-48, iter-120 --> loss: 0.062
+--------------------------------
+Test acc iter-120: 88%
+--------------------------------
+Epoch-48, iter-130 --> loss: 0.079
+Epoch-48, iter-140 --> loss: 0.064
+Model in 48 is stored.
+Epoch-49, iter-10 --> loss: 0.048
+Epoch-49, iter-20 --> loss: 0.036
+Epoch-49, iter-30 --> loss: 0.060
+Epoch-49, iter-40 --> loss: 0.049
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-49, iter-50 --> loss: 0.038
+Epoch-49, iter-60 --> loss: 0.045
+Epoch-49, iter-70 --> loss: 0.055
+Epoch-49, iter-80 --> loss: 0.056
+--------------------------------
+Test acc iter-80: 88%
+--------------------------------
+Epoch-49, iter-90 --> loss: 0.048
+Epoch-49, iter-100 --> loss: 0.041
+Epoch-49, iter-110 --> loss: 0.044
+Epoch-49, iter-120 --> loss: 0.059
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-49, iter-130 --> loss: 0.057
+Epoch-49, iter-140 --> loss: 0.047
+Model in 49 is stored.
+Epoch-50, iter-10 --> loss: 0.036
+Epoch-50, iter-20 --> loss: 0.033
+Epoch-50, iter-30 --> loss: 0.042
+Epoch-50, iter-40 --> loss: 0.043
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-50, iter-50 --> loss: 0.017
+Epoch-50, iter-60 --> loss: 0.039
+Epoch-50, iter-70 --> loss: 0.028
+Epoch-50, iter-80 --> loss: 0.059
+--------------------------------
+Test acc iter-80: 89%
+--------------------------------
+Epoch-50, iter-90 --> loss: 0.030
+Epoch-50, iter-100 --> loss: 0.066
+Epoch-50, iter-110 --> loss: 0.050
+Epoch-50, iter-120 --> loss: 0.064
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-50, iter-130 --> loss: 0.056
+Epoch-50, iter-140 --> loss: 0.059
+Model in 50 is stored.
+Epoch-51, iter-10 --> loss: 0.057
+Epoch-51, iter-20 --> loss: 0.039
+Epoch-51, iter-30 --> loss: 0.076
+Epoch-51, iter-40 --> loss: 0.055
+--------------------------------
+Test acc iter-40: 89%
+--------------------------------
+Epoch-51, iter-50 --> loss: 0.094
+Epoch-51, iter-60 --> loss: 0.081
+Epoch-51, iter-70 --> loss: 0.051
+Epoch-51, iter-80 --> loss: 0.057
+--------------------------------
+Test acc iter-80: 89%
+--------------------------------
+Epoch-51, iter-90 --> loss: 0.039
+Epoch-51, iter-100 --> loss: 0.062
+Epoch-51, iter-110 --> loss: 0.078
+Epoch-51, iter-120 --> loss: 0.095
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-51, iter-130 --> loss: 0.043
+Epoch-51, iter-140 --> loss: 0.042
+Model in 51 is stored.
+Epoch-52, iter-10 --> loss: 0.044
+Epoch-52, iter-20 --> loss: 0.036
+Epoch-52, iter-30 --> loss: 0.035
+Epoch-52, iter-40 --> loss: 0.058
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-52, iter-50 --> loss: 0.031
+Epoch-52, iter-60 --> loss: 0.031
+Epoch-52, iter-70 --> loss: 0.038
+Epoch-52, iter-80 --> loss: 0.042
+--------------------------------
+Test acc iter-80: 89%
+--------------------------------
+Epoch-52, iter-90 --> loss: 0.024
+Epoch-52, iter-100 --> loss: 0.038
+Epoch-52, iter-110 --> loss: 0.023
+Epoch-52, iter-120 --> loss: 0.022
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-52, iter-130 --> loss: 0.040
+Epoch-52, iter-140 --> loss: 0.065
+Model in 52 is stored.
+Epoch-53, iter-10 --> loss: 0.015
+Epoch-53, iter-20 --> loss: 0.063
+Epoch-53, iter-30 --> loss: 0.027
+Epoch-53, iter-40 --> loss: 0.022
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-53, iter-50 --> loss: 0.037
+Epoch-53, iter-60 --> loss: 0.031
+Epoch-53, iter-70 --> loss: 0.033
+Epoch-53, iter-80 --> loss: 0.026
+--------------------------------
+Test acc iter-80: 89%
+--------------------------------
+Epoch-53, iter-90 --> loss: 0.037
+Epoch-53, iter-100 --> loss: 0.012
+Epoch-53, iter-110 --> loss: 0.039
+Epoch-53, iter-120 --> loss: 0.028
+--------------------------------
+Test acc iter-120: 88%
+--------------------------------
+Epoch-53, iter-130 --> loss: 0.045
+Epoch-53, iter-140 --> loss: 0.033
+Model in 53 is stored.
+Epoch-54, iter-10 --> loss: 0.019
+Epoch-54, iter-20 --> loss: 0.022
+Epoch-54, iter-30 --> loss: 0.038
+Epoch-54, iter-40 --> loss: 0.019
+--------------------------------
+Test acc iter-40: 89%
+--------------------------------
+Epoch-54, iter-50 --> loss: 0.053
+Epoch-54, iter-60 --> loss: 0.018
+Epoch-54, iter-70 --> loss: 0.026
+Epoch-54, iter-80 --> loss: 0.035
+--------------------------------
+Test acc iter-80: 89%
+--------------------------------
+Epoch-54, iter-90 --> loss: 0.031
+Epoch-54, iter-100 --> loss: 0.024
+Epoch-54, iter-110 --> loss: 0.049
+Epoch-54, iter-120 --> loss: 0.047
+--------------------------------
+Test acc iter-120: 88%
+--------------------------------
+Epoch-54, iter-130 --> loss: 0.044
+Epoch-54, iter-140 --> loss: 0.068
+Model in 54 is stored.
+Epoch-55, iter-10 --> loss: 0.030
+Epoch-55, iter-20 --> loss: 0.013
+Epoch-55, iter-30 --> loss: 0.020
+Epoch-55, iter-40 --> loss: 0.030
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-55, iter-50 --> loss: 0.061
+Epoch-55, iter-60 --> loss: 0.034
+Epoch-55, iter-70 --> loss: 0.049
+Epoch-55, iter-80 --> loss: 0.022
+--------------------------------
+Test acc iter-80: 89%
+--------------------------------
+Epoch-55, iter-90 --> loss: 0.040
+Epoch-55, iter-100 --> loss: 0.037
+Epoch-55, iter-110 --> loss: 0.036
+Epoch-55, iter-120 --> loss: 0.030
+--------------------------------
+Test acc iter-120: 88%
+--------------------------------
+Epoch-55, iter-130 --> loss: 0.047
+Epoch-55, iter-140 --> loss: 0.042
+Model in 55 is stored.
+Epoch-56, iter-10 --> loss: 0.043
+Epoch-56, iter-20 --> loss: 0.019
+Epoch-56, iter-30 --> loss: 0.051
+Epoch-56, iter-40 --> loss: 0.033
+--------------------------------
+Test acc iter-40: 90%
+--------------------------------
+Epoch-56, iter-50 --> loss: 0.034
+Epoch-56, iter-60 --> loss: 0.031
+Epoch-56, iter-70 --> loss: 0.031
+Epoch-56, iter-80 --> loss: 0.046
+--------------------------------
+Test acc iter-80: 89%
+--------------------------------
+Epoch-56, iter-90 --> loss: 0.020
+Epoch-56, iter-100 --> loss: 0.031
+Epoch-56, iter-110 --> loss: 0.032
+Epoch-56, iter-120 --> loss: 0.063
+--------------------------------
+Test acc iter-120: 88%
+--------------------------------
+Epoch-56, iter-130 --> loss: 0.038
+Epoch-56, iter-140 --> loss: 0.024
+Model in 56 is stored.
+Epoch-57, iter-10 --> loss: 0.013
+Epoch-57, iter-20 --> loss: 0.037
+Epoch-57, iter-30 --> loss: 0.025
+Epoch-57, iter-40 --> loss: 0.036
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-57, iter-50 --> loss: 0.037
+Epoch-57, iter-60 --> loss: 0.029
+Epoch-57, iter-70 --> loss: 0.076
+Epoch-57, iter-80 --> loss: 0.012
+--------------------------------
+Test acc iter-80: 90%
+--------------------------------
+Epoch-57, iter-90 --> loss: 0.030
+Epoch-57, iter-100 --> loss: 0.026
+Epoch-57, iter-110 --> loss: 0.035
+Epoch-57, iter-120 --> loss: 0.053
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-57, iter-130 --> loss: 0.026
+Epoch-57, iter-140 --> loss: 0.046
+Model in 57 is stored.
+Epoch-58, iter-10 --> loss: 0.016
+Epoch-58, iter-20 --> loss: 0.047
+Epoch-58, iter-30 --> loss: 0.020
+Epoch-58, iter-40 --> loss: 0.011
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-58, iter-50 --> loss: 0.013
+Epoch-58, iter-60 --> loss: 0.051
+Epoch-58, iter-70 --> loss: 0.029
+Epoch-58, iter-80 --> loss: 0.020
+--------------------------------
+Test acc iter-80: 88%
+--------------------------------
+Epoch-58, iter-90 --> loss: 0.036
+Epoch-58, iter-100 --> loss: 0.038
+Epoch-58, iter-110 --> loss: 0.047
+Epoch-58, iter-120 --> loss: 0.029
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-58, iter-130 --> loss: 0.035
+Epoch-58, iter-140 --> loss: 0.019
+Model in 58 is stored.
+Epoch-59, iter-10 --> loss: 0.020
+Epoch-59, iter-20 --> loss: 0.041
+Epoch-59, iter-30 --> loss: 0.026
+Epoch-59, iter-40 --> loss: 0.038
+--------------------------------
+Test acc iter-40: 88%
+--------------------------------
+Epoch-59, iter-50 --> loss: 0.026
+Epoch-59, iter-60 --> loss: 0.021
+Epoch-59, iter-70 --> loss: 0.027
+Epoch-59, iter-80 --> loss: 0.015
+--------------------------------
+Test acc iter-80: 88%
+--------------------------------
+Epoch-59, iter-90 --> loss: 0.031
+Epoch-59, iter-100 --> loss: 0.038
+Epoch-59, iter-110 --> loss: 0.029
+Epoch-59, iter-120 --> loss: 0.027
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-59, iter-130 --> loss: 0.017
+Epoch-59, iter-140 --> loss: 0.017
+Model in 59 is stored.
+Epoch-60, iter-10 --> loss: 0.011
+Epoch-60, iter-20 --> loss: 0.027
+Epoch-60, iter-30 --> loss: 0.053
+Epoch-60, iter-40 --> loss: 0.057
+--------------------------------
+Test acc iter-40: 89%
+--------------------------------
+Epoch-60, iter-50 --> loss: 0.021
+Epoch-60, iter-60 --> loss: 0.052
+Epoch-60, iter-70 --> loss: 0.021
+Epoch-60, iter-80 --> loss: 0.047
+--------------------------------
+Test acc iter-80: 88%
+--------------------------------
+Epoch-60, iter-90 --> loss: 0.027
+Epoch-60, iter-100 --> loss: 0.030
+Epoch-60, iter-110 --> loss: 0.034
+Epoch-60, iter-120 --> loss: 0.030
+--------------------------------
+Test acc iter-120: 89%
+--------------------------------
+Epoch-60, iter-130 --> loss: 0.028
+Epoch-60, iter-140 --> loss: 0.052
+Model in 60 is stored.
