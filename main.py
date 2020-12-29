@@ -6,7 +6,6 @@ from torchvision import datasets ,models,transforms
 from matplotlib import pyplot as plt
 import numpy as np
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
 import torch.optim as optim
 from torch.autograd import Variable
 import torchvision, os
@@ -28,8 +27,8 @@ NETWORK = ['alexnet',
 NETWORK = NETWORK[1]
 N_EPOCH = 60
 
-RESUMED_MODEL = './model/alexnet_epoch-4.pt'
-IS_RESUMED = False
+RESUMED_MODEL = 'mobilenet_v2_epoch-46.pt' # path of model you wanna resume
+IS_RESUMED = True # change to True to resume the model training, vice versa
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -73,6 +72,9 @@ def main():
         print("Last resumed epoch:", epoch_last)
         print("Last resumed model loss:", loss_last)
 
+    # make model directory if doesn't exist yet
+    if(not os.path.exists(DIR_STORE_MODEL)):
+        os.makedirs(DIR_STORE_MODEL)
 
     for epoch in range(N_EPOCH-epoch_last):  # loop over the dataset multiple times
         epoch = epoch + epoch_last + 1
