@@ -11,6 +11,8 @@ from torch.autograd import Variable
 import torchvision, os
 from PIL import Image
 from mobilenet_v2 import MobileNet2
+import time, cv2
+
 
 # global variable
 path_to_dir = ['/Users/poyuanjeng/Documents/Deep Learning NCTU/final_project/',
@@ -24,20 +26,28 @@ DIR_STORE_MODEL = DIR_STORE_MODEL[-1]
 MODEL_NAME = '.pt' #specify only the extension, the name will be automatically assigned
 
 NETWORK = ['alexnet',
-           'mobilenet_v2']
-NETWORK = NETWORK[1]
+           'mobilenet_v2',
+           'mobilenet_v2_bg',
+           'small']
+NETWORK = NETWORK[2]
 N_EPOCH = 100
 MODE = ['train', 'infer']
 MODE = MODE[1]
 
-RESUMED_MODEL = 'model/mobilenet_v2_epoch-60.pt' # path of model you wanna resume
+RESUMED_MODEL = 'model/mobilenet_v2_bg_epoch-2.pt' # path of model you wanna resume
 IS_RESUMED = True # change to True to resume the model training, vice versa
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+size_downscale = (75, 100) #
 
 def main():
+    if(NETWORK == 'mobilenet_v2' or 'alexnet'):
+        size_downscale = (101,101)
+    else:
+        size_downscale = (75,100)
+
     if (MODE == 'train'):
-        transform = transforms.Compose([transforms.Resize((101,101)),
+        transform = transforms.Compose([transforms.Resize(size_downscale),
                                         transforms.ToTensor(),
                                         transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
 
@@ -59,6 +69,10 @@ def main():
             net = AlexNet().to(DEVICE)
         elif(NETWORK == 'mobilenet_v2'):
             net = MobileNet2(input_size=101, num_classes=18).to(DEVICE)
+        elif(NETWORK == 'small'):
+            net = smallNet(n_class=18).to(DEVICE)
+        elif(NETWORK == 'mobilenet_v2_bg'):
+            net = MobileNet2(input_size=100, num_classes=19).to(DEVICE)
         else:
             raise Exception("Whoops! Select the correct network or make the new one.")
 
@@ -123,15 +137,27 @@ def main():
                             'loss': (running_loss_batch/batch_idx)},
                            os.path.join(DIR_STORE_MODEL, MODEL_NAME2))
     elif(MODE == 'infer'):
-        IMG_IN_PATH = "./Trail_dataset/test_data/L_1/0.1082408_529.jpeg"
-        MODEL_PATH = "./model/mobilenet_v2_epoch-80.pt"
-        net = MobileNet2(input_size=101, num_classes=18)
+        print("Network:", NETWORK)
+        IMG_IN_PATH = "./Trail_dataset/test_data/L_1/0.12321735_262.jpeg"
+        img_cv = cv2.imread(IMG_IN_PATH, 1)
+        img_cv = cv2.resize(img_cv, (100,75), interpolation=cv2.INTER_AREA)
+        #img_cv = cv2.resize(img_cv,(101,101))
+        cv2.imshow("img_cv", img_cv)
+        MODEL_PATH = "./model/mobilenet_v2_bg_epoch-100.pt"
+        time0 = time.time()
+        net = MobileNet2(input_size=100, num_classes=19)
         checkpoint = torch.load(MODEL_PATH)
         net.load_state_dict(checkpoint['model_state_dict'])
+        print("Load model time:", time.time()-time0)
+        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(np.uint8(img_cv))
         img = Image.open(IMG_IN_PATH)
-        prediction = infer(net, img)
+        time0 = time.time()
+        for i in range(20):
+            prediction = infer(net, img)
+        print("Time predict.: ", (time.time()-time0)/20)
         print("Prediction: ", prediction)
-
+        cv2.waitKey()
 #CNN model
 class AlexNet(nn.Module):
     def __init__(self):
@@ -169,6 +195,35 @@ class AlexNet(nn.Module):
         x = self.classifier(x)
         return F.log_softmax(x, dim=1)
 
+
+class smallNet(nn.Module):
+    def __init__(self, n_class):
+        super(smallNet, self).__init__()
+        self.conv1 = nn.Conv2d(3, 20, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(20, 30, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(30, 40, kernel_size=3, stride=1, padding=1)
+        self.dropout1 = nn.Dropout2d(0.5)
+        self.dropout2 = nn.Dropout2d(0.5)
+        self.fc1 = nn.Linear(37*50*40, 128)
+        self.fc2 = nn.Linear(128, n_class)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+        x = self.conv3(x)
+        x = F.relu(x)
+        x = self.dropout1(x)
+        x = torch.flatten(x, 1)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.dropout2(x)
+        x = self.fc2(x)
+
+        return F.log_softmax(x, dim=1)
+
 #Accuracy present
 def test(loader, net):
     net.eval() # set the network mode to evaluation mode
@@ -196,7 +251,7 @@ def infer(net, image):
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net.to(DEVICE)
     net.eval()
-    transform = transforms.Compose([transforms.Resize((101, 101)),
+    transform = transforms.Compose([transforms.Resize(size_downscale),
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     input = transform(image).to(DEVICE)
