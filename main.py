@@ -34,7 +34,7 @@ NETWORK = ['alexnet',
 NETWORK = NETWORK[1]
 N_EPOCH = 200
 MODE = ['train', 'infer']
-MODE = MODE[0]
+MODE = MODE[1]
 
 RESUMED_MODEL = 'model/mobilenet_v2_epoch-112.pt' # path of model you wanna resume
 IS_RESUMED = True # change to True to resume the model training, vice versa
@@ -155,15 +155,15 @@ def main():
     elif(MODE == 'infer'):
         print("Network:", NETWORK)
         print("Device:", DEVICE)
-        IMG_IN_PATH = "./Trail_dataset/test_data/L_1/0.12820954_1273.jpeg"
+        IMG_IN_PATH = "./new_data_2020-1-6/01/24.jpg"
         img_cv = cv2.imread(IMG_IN_PATH, 1)
-        MODEL_PATH = "./model/mobilenet_v2_bg_epoch-110.pt"
+        MODEL_PATH = "./mobilenet_v2_epoch-122.pt"
         time0 = time.time()
-        net = MobileNet2(input_size=100, num_classes=19).to(DEVICE)
+        net = MobileNet2(input_size=100, num_classes=18).to(DEVICE)
         checkpoint = torch.load(MODEL_PATH)
         net.load_state_dict(checkpoint['model_state_dict'])
         print("Load model time:", time.time()-time0)
-        INPUT_TYPE = ['image', 'video', 'manual_test', 'auto_test']
+        INPUT_TYPE = ['image', 'video', 'manual_test', 'auto_test', 'new_data_test']
         INPUT_TYPE = INPUT_TYPE[1]
         omega_array = np.array([0.1,0.17,0.24,0.305,0.37,0.44,0.505,0.73,-0.1,-0.17,-0.24,-0.305,-0.37,-0.44,-0.505,-0.73,0.0,0.0])
         if(INPUT_TYPE == 'image'):
@@ -187,18 +187,29 @@ def main():
             count = 0
             while success:
                 image = image.astype(np.uint8)
-                image_resize = cv2.resize(image, (100, 75), interpolation=cv2.INTER_AREA)
-                cv2.imshow("video", image_resize)
+                image_bgr= np.copy(image)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 img = Image.fromarray(np.uint8(image))
-                prediction = infer(net, img)
-                if(prediction != 18):
-                    omega = omega_array[prediction]
-                else:
-                    omega = -999
-                print(count,"-class: ", prediction, ", omega: ", omega)
-                success, image = vidcap.read()
+                # prediction = infer(net, img)
+                # if(prediction != 18):
+                #     omega = omega_array[prediction]
+                # else:
+                #     omega = -999
+                # print(count,"-class: ", prediction, ", omega: ", omega)
+                # START using segmentation approach and draw the results
+                isSegmented, targetCoor, rotation_rad = segment(image)
+                image_bgr = cv2.putText(image_bgr, ".", (targetCoor[0], targetCoor[1]),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 2)
+                image_bgr = cv2.putText(image_bgr, str(rotation_rad), (100, 100),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                image_bgr = cv2.line(image_bgr, ((int)(image.shape[1] / 2), (int)(image.shape[0])),
+                               targetCoor, (0, 255, 0))
+                # END using segmentation approach and draw the results
+
+                image_resize = cv2.resize(image_bgr, (640, 480), interpolation=cv2.INTER_AREA)
+                cv2.imshow("video", image_resize)
                 count += 1
+                success, image = vidcap.read()
                 if cv2.waitKey(1) == 27:
                     break
         elif(INPUT_TYPE == "manual_test"):
@@ -251,6 +262,49 @@ def main():
             print("acc_test:", acc_test)
 
             print("Dummy...")
+        elif(INPUT_TYPE == 'new_data_test'):
+            # read all dataset test
+            TEST_DIR = "./Trail_dataset/test_data"
+            wrong_pred_dir = "./wrong_pred"
+            dict_class = {}
+            list_folder = os.listdir(TEST_DIR);
+            list_folder = sorted(list_folder)
+            for i in range(len(list_folder)):
+                dict_class[str(i)] = list_folder[i]
+            list_folder = [os.path.join(TEST_DIR, i) for i in list_folder]
+            list_img_path = [];
+            class_label = []
+            for idx, i in enumerate(list_folder):
+                list_img = os.listdir(i);
+                list_img = sorted(list_img)
+                for j in list_img:
+                    list_img_path.append(os.path.join(i, j))
+                    class_label.append(idx)
+            # perform inference
+            sum_correct = 0;
+            n = 0
+            print("N test img:", len(class_label))
+            for i, j in zip(list_img_path, class_label):
+                i = i.replace("\\", "/")
+                dir_name = i.split('/')[-2]
+                filename_ori = i.split('/')[-1]
+                img = Image.open(i)
+                pred = infer(net, img)
+                label = j
+                if (label == pred):
+                    sum_correct += 1
+                else:  # wrong pred is encountered
+                    # write wrong pred to file
+                    pred_dir = dict_class[str(pred)]
+                    img = np.asarray(img);
+                    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                    filename = "gt-" + dir_name + "_pred-" + pred_dir + "_" + filename_ori
+                    cv2.imwrite(os.path.join(wrong_pred_dir, filename), img)
+                n += 1
+                if ((n % 100) == 0):
+                    print(n, " -> acc:", sum_correct / n)
+            print("Accumulated acc:", sum_correct / n)
+
 
 #CNN model
 class AlexNet(nn.Module):
@@ -334,6 +388,66 @@ def test(loader, net):
         correct += (predicted == labels).sum()
     return (100.0 * correct / total).item()
 
+def segment(img):
+    isSegmented = False; rotation_rad = 0; targetCoor = ((int)(img.shape[1]/2),0)
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+
+    # Range for blue
+    lower_blue = np.array([100, 100, 40])
+    upper_blue = np.array([140, 255, 255])
+    mask1 = cv2.inRange(img_hsv, lower_blue, upper_blue)
+
+    # Range for yellow
+    lower_yelllow = np.array([10, 100, 40])
+    upper_yellow = np.array([50, 255, 255])
+    mask2 = cv2.inRange(img_hsv, lower_yelllow, upper_yellow)
+    mask = mask1 + mask2
+
+    kernel = np.ones((20, 20))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    kernel = np.ones((10, 10))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    # cv2.imshow("mask", mask)
+    # cv2.waitKey()
+    image = mask.astype('uint8')
+    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=4)
+
+    if (nb_components >= 2): # at least has one background and segmented foreground
+        areas = stats[:, -1]
+        max_label = 1 #0 is for the background, so, skip it
+        max_area = areas[1]
+        for i in range(2, nb_components):
+            if areas[i] > max_area:
+                max_label = i
+                max_area = areas[i]
+
+        center = centroids[max_label].astype(np.int16)
+        delta = 20
+        up_lim = center[1] + delta; low_lim = center[1] - delta
+        img2 = np.zeros(output.shape)
+        img2[output == max_label] = 255
+        crop_img = img2[low_lim:up_lim, :]
+
+        # rerun connected component again to get the new horizontal center
+        crop_img = crop_img.astype('uint8')
+        nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(crop_img, connectivity=4)
+        if ((nb_components >= 2) and max_area > 700):  # at least has one background and segmented foreground
+            isSegmented = True
+            areas = stats[:, -1]
+            max_label = 1
+            max_area = areas[1]
+            for i in range(2, nb_components):
+                if areas[i] > max_area:
+                    max_label = i
+                    max_area = areas[i]
+            targetCoor = ((int)(centroids[max_label][0]),(int)(center[1]))
+            #calculate the rotation degree
+            x_vec = (img.shape[1]/2)-targetCoor[0]
+            y_vec = img.shape[0]-targetCoor[1]
+            rotation_rad = np.arctan(x_vec/y_vec)
+
+    return isSegmented, targetCoor, rotation_rad
+
 def infer(net, image):
     """
     To infer an image using trained model
@@ -351,10 +465,12 @@ def infer(net, image):
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     input = transform(image).to(DEVICE)
-    input = input.unsqueeze(0)
     # print("Input with manual loader:", input)
+    input = input.unsqueeze(0)
     outputs = net(input)
+    # print("output:", outputs)
     _, predicted = torch.max(outputs.data, 1)
+    predicted = outputs.argmax()
 
     return predicted.item()
 
