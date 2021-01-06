@@ -203,8 +203,11 @@ class Lane_follow(object):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.initial()
         self.omega = 0
+        self.omega_pos = 0.2
+        self.omega_neg = -0.2
         self.count = 0
-        self.last_omega = [0,0,0,0,0]
+        self.last_omega_new = [0, 0, 0, 0, 0]
+        self.last_omega_ori = [0, 0, 0, 0, 0]
         self.last_stop = [0,0,0,0,0]
         #self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.size_downscale = (75,100)
@@ -248,7 +251,7 @@ class Lane_follow(object):
 
                 images = images.to(self.device)
                 output = self.model(images)
-                top1 = output.argmax()
+                top1 = output.argmax().item()
                 self.omega = self.Omega[top1]
 
                 # motor control
@@ -256,23 +259,36 @@ class Lane_follow(object):
                 if(top1 <= 17): #if the input contains route line
                     car_cmd_msg.linear.x = 0.123
                     temp_ang_z = self.omega*0.64
+                    # put to the "last omega new output" list
+                    self.last_omega_new.append(temp_ang_z)
+                    self.last_omega_new.pop()
+                    # put to the "last omega ori output" list
+                    self.last_omega_ori.append(self.omega)
+                    self.last_omega_ori.pop()
+                    # put to the last "stop status" list
                     self.last_stop.append(0)
                     self.last_stop.pop()
                 else: #if the input contains no route line
+                    # put to the last "stop status" list
                     self.last_stop.append(1)
                     self.last_stop.pop()
 
-                # check if the robot see x blank route, then stop
+                # check if the robot see "n" blank route, then stop
                 isStop = (float)(sum(self.last_stop))/(float)(len(self.last_stop))
                 if(isStop == 1):
                     car_cmd_msg.linear.x = 0 #set robot to stop and rotate to find the route
-                    # apply heuristic here!
-
-                # perform smoothing for last x omega
-                self.last_omega.append(temp_ang_z)
-                self.last_omega.pop()
-                temp_ang_z = sum(self.last_omega) / (float)(len(self.last_omega))
-                car_cmd_msg.angular.z = temp_ang_z
+                    # apply heuristic rule here!
+                    lastOmegaOri = (float)(sum(self.last_omega_ori)) / (float)(len(self.last_omega_ori))
+                    if(lastOmegaOri > 0.2): #rule to inversely turn
+                        car_cmd_msg.angular.z = self.omega_neg #neg means turn right
+                    elif(lastOmegaOri < -0.2): #rule to inversely turn
+                        car_cmd_msg.angular.z = self.omega_pos #pos means turn left
+                    else: #rule to turn right (when the robot's prev. state is 'go ahead')
+                        car_cmd_msg.angular.z = self.omega_neg  # neg means turn right
+                else:
+                    # perform smoothing for last x omega
+                    temp_ang_z = (float)(sum(self.last_omega_new)) / (float)(len(self.last_omega_new))
+                    car_cmd_msg.angular.z = temp_ang_z
 
                 self.pub_car_cmd.publish(car_cmd_msg)
                 rospy.loginfo(str(car_cmd_msg.angular.z))

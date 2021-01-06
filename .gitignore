@@ -1,6 +1,12 @@
 model
 /model
-Trail_dataset
-Trail_dataset/
+Trail_dataset18
+Trail_dataset19
+img_explore
+wrong_pred
 __pycache__
 .idea
+newdata
+vid1.mp4
+vid2.mp4
+vid3.mp4

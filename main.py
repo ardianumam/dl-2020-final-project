@@ -21,6 +21,8 @@ path_to_dir = path_to_dir[-1]
 
 DIR_STORE_MODEL = ['/home/austin/trailnet-testing-Pytorch/duckiefloat_line_follow/src/line_detect/src/line_angle_A.pth',
                    './model']
+TRAIN_DIR = '' #modified in the code
+TEST_DIR = '' #modified in the code
 DIR_STORE_MODEL = DIR_STORE_MODEL[-1]
 
 MODEL_NAME = '.pt' #specify only the extension, the name will be automatically assigned
@@ -29,35 +31,48 @@ NETWORK = ['alexnet',
            'mobilenet_v2',
            'mobilenet_v2_bg',
            'small']
-NETWORK = NETWORK[2]
-N_EPOCH = 100
+NETWORK = NETWORK[1]
+N_EPOCH = 200
 MODE = ['train', 'infer']
-MODE = MODE[1]
+MODE = MODE[0]
 
-RESUMED_MODEL = 'model/mobilenet_v2_bg_epoch-2.pt' # path of model you wanna resume
+RESUMED_MODEL = 'model/mobilenet_v2_epoch-112.pt' # path of model you wanna resume
 IS_RESUMED = True # change to True to resume the model training, vice versa
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 size_downscale = (75, 100) #
 
 def main():
-    if(NETWORK == 'mobilenet_v2' or 'alexnet'):
+    global size_downscale, TRAIN_DIR, TEST_DIR
+
+    #if(NETWORK == 'mobilenet_v2' or 'alexnet'): THISSSS OLDDDD CAUSE!!!!!
+    if (NETWORK == 'alexnet'):
         size_downscale = (101,101)
-    else:
+    elif(NETWORK == 'mobilenet_v2'):
         size_downscale = (75,100)
+        TRAIN_DIR = 'Trail_dataset18/train_data'
+        TEST_DIR = 'Trail_dataset18/test_data'
+    elif(NETWORK == 'mobilenet_v2_bg'):
+        size_downscale = (75, 100)
+        TRAIN_DIR = 'Trail_dataset19/train_data'
+        TEST_DIR = 'Trail_dataset19/test_data'
+
 
     if (MODE == 'train'):
-        transform = transforms.Compose([transforms.Resize(size_downscale),
+        transform0 = transforms.RandomApply([transforms.ColorJitter(),
+                                                                 ],
+                                            p = 0.3)
+        transform = transforms.Compose([transform0, transforms.Resize(size_downscale),
                                         transforms.ToTensor(),
                                         transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
 
         #load image from folder and set foldername as label
         train_data = datasets.ImageFolder(
-            path_to_dir+'Trail_dataset/train_data',
+            path_to_dir+TRAIN_DIR,
             transform = transform)
 
         test_data = datasets.ImageFolder(
-            path_to_dir+'Trail_dataset/test_data',
+            path_to_dir+TEST_DIR,
             transform = transform)
 
         train_loader = torch.utils.data.DataLoader(train_data, batch_size=40,shuffle= True)
@@ -65,10 +80,11 @@ def main():
 
         print("Used device:", DEVICE)
         print("Used network:", NETWORK)
+        print("Input size:", size_downscale)
         if(NETWORK == 'alexnet'):
             net = AlexNet().to(DEVICE)
         elif(NETWORK == 'mobilenet_v2'):
-            net = MobileNet2(input_size=101, num_classes=18).to(DEVICE)
+            net = MobileNet2(input_size=100, num_classes=18).to(DEVICE)
         elif(NETWORK == 'small'):
             net = smallNet(n_class=18).to(DEVICE)
         elif(NETWORK == 'mobilenet_v2_bg'):
@@ -138,26 +154,104 @@ def main():
                            os.path.join(DIR_STORE_MODEL, MODEL_NAME2))
     elif(MODE == 'infer'):
         print("Network:", NETWORK)
-        IMG_IN_PATH = "./Trail_dataset/test_data/L_1/0.12321735_262.jpeg"
+        print("Device:", DEVICE)
+        IMG_IN_PATH = "./Trail_dataset/test_data/L_1/0.12820954_1273.jpeg"
         img_cv = cv2.imread(IMG_IN_PATH, 1)
-        img_cv = cv2.resize(img_cv, (100,75), interpolation=cv2.INTER_AREA)
-        #img_cv = cv2.resize(img_cv,(101,101))
-        cv2.imshow("img_cv", img_cv)
-        MODEL_PATH = "./model/mobilenet_v2_bg_epoch-100.pt"
+        MODEL_PATH = "./model/mobilenet_v2_bg_epoch-110.pt"
         time0 = time.time()
-        net = MobileNet2(input_size=100, num_classes=19)
+        net = MobileNet2(input_size=100, num_classes=19).to(DEVICE)
         checkpoint = torch.load(MODEL_PATH)
         net.load_state_dict(checkpoint['model_state_dict'])
         print("Load model time:", time.time()-time0)
-        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(np.uint8(img_cv))
-        img = Image.open(IMG_IN_PATH)
-        time0 = time.time()
-        for i in range(20):
-            prediction = infer(net, img)
-        print("Time predict.: ", (time.time()-time0)/20)
-        print("Prediction: ", prediction)
-        cv2.waitKey()
+        INPUT_TYPE = ['image', 'video', 'manual_test', 'auto_test']
+        INPUT_TYPE = INPUT_TYPE[1]
+        omega_array = np.array([0.1,0.17,0.24,0.305,0.37,0.44,0.505,0.73,-0.1,-0.17,-0.24,-0.305,-0.37,-0.44,-0.505,-0.73,0.0,0.0])
+        if(INPUT_TYPE == 'image'):
+            img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+            img_cv = Image.fromarray(np.uint8(img_cv))
+            img_pil = Image.open(IMG_IN_PATH)
+            # img2 = list(img2.getdata())
+            time0 = time.time()
+
+            for i in range(20):
+                prediction_cv = infer(net, img_cv)
+                prediction_pil = infer(net, img_pil)
+            print("Time predict.: ", (time.time()-time0)/20)
+            print("Prediction cv: ", prediction_cv)
+            print("Prediction pil: ", prediction_pil)
+            # cv2.waitKey()
+        elif(INPUT_TYPE == 'video'):
+            #vidcap = cv2.VideoCapture(0)
+            vidcap = cv2.VideoCapture('./vid3.mp4')
+            success, image = vidcap.read()
+            count = 0
+            while success:
+                image = image.astype(np.uint8)
+                image_resize = cv2.resize(image, (100, 75), interpolation=cv2.INTER_AREA)
+                cv2.imshow("video", image_resize)
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                img = Image.fromarray(np.uint8(image))
+                prediction = infer(net, img)
+                if(prediction != 18):
+                    omega = omega_array[prediction]
+                else:
+                    omega = -999
+                print(count,"-class: ", prediction, ", omega: ", omega)
+                success, image = vidcap.read()
+                count += 1
+                if cv2.waitKey(1) == 27:
+                    break
+        elif(INPUT_TYPE == "manual_test"):
+            # read all dataset test
+            TEST_DIR = "./Trail_dataset/test_data"
+            wrong_pred_dir = "./wrong_pred"
+            dict_class = {}
+            list_folder = os.listdir(TEST_DIR); list_folder = sorted(list_folder)
+            for i in range(len(list_folder)):
+                dict_class[str(i)] = list_folder[i]
+            list_folder = [os.path.join(TEST_DIR,i) for i in list_folder]
+            list_img_path = []; class_label = []
+            for idx, i in enumerate(list_folder):
+                list_img = os.listdir(i); list_img = sorted(list_img)
+                for j in list_img:
+                    list_img_path.append(os.path.join(i,j))
+                    class_label.append(idx)
+            # perform inference
+            sum_correct = 0; n = 0
+            print("N test img:", len(class_label))
+            for i,j in zip(list_img_path, class_label):
+                i = i.replace("\\","/")
+                dir_name = i.split('/')[-2]
+                filename_ori = i.split('/')[-1]
+                img = Image.open(i)
+                pred = infer(net, img)
+                label = j
+                if(label==pred):
+                    sum_correct += 1
+                else: #wrong pred is encountered
+                    # write wrong pred to file
+                    pred_dir = dict_class[str(pred)]
+                    img = np.asarray(img); img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                    filename = "gt-"+dir_name+"_pred-"+pred_dir+"_"+filename_ori
+                    cv2.imwrite(os.path.join(wrong_pred_dir,filename), img)
+                n += 1
+                if((n%100)==0):
+                    print(n," -> acc:", sum_correct/n)
+            print("Accumulated acc:", sum_correct / n)
+        elif(INPUT_TYPE == "auto_test"):
+            transform = transforms.Compose([transforms.Resize(size_downscale),
+                                            transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+            test_data = datasets.ImageFolder(
+                path_to_dir + TEST_DIR,
+                transform=transform)
+            test_loader = torch.utils.data.DataLoader(test_data, batch_size=40, shuffle=False)
+            acc_test = test(test_loader, net)
+            print("Test using pytorch loader!")
+            print("acc_test:", acc_test)
+
+            print("Dummy...")
+
 #CNN model
 class AlexNet(nn.Module):
     def __init__(self):
@@ -248,6 +342,8 @@ def infer(net, image):
     :param class2deg: dictionary to map class to rotation degree
     :return: streering degree
     """
+    img_pil2 = np.asarray(image)
+    # print("Img PIL 2:", img_pil2)
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net.to(DEVICE)
     net.eval()
@@ -256,6 +352,7 @@ def infer(net, image):
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     input = transform(image).to(DEVICE)
     input = input.unsqueeze(0)
+    # print("Input with manual loader:", input)
     outputs = net(input)
     _, predicted = torch.max(outputs.data, 1)
 
