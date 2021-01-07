@@ -304,7 +304,7 @@ class Lane_follow(object):
         targetCoor = detegted target point of the robot route
         rotation_rad = robot heading rotation, in radian, counter-clockwise
         """
-        isSegmented = False; rotation_rad = 0; targetCoor = ((int)(img.shape[1] / 2), 0); x_vec = 0; y_vec = 0
+        isSegmented = False; rotation_rad = 0; targetCoor = ((int)(img.shape[1] / 2), 0)
         img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
 
         # Range for blue
@@ -358,18 +358,18 @@ class Lane_follow(object):
                         max_area = areas[i]
                 targetCoor = ((int)(centroids[max_label][0]), (int)(center[1]))
                 # calculate the rotation degree
-                x_vec = (float)((img.shape[1] / 2) - targetCoor[0])
-                y_vec = (float)(img.shape[0] - targetCoor[1])
-                rotation_rad = (float)(np.arctan(x_vec / y_vec))
+                x_vec = (img.shape[1] / 2) - targetCoor[0]
+                y_vec = img.shape[0] - targetCoor[1]
+                rotation_rad = np.arctan(x_vec / y_vec)
 
-        return isSegmented, targetCoor, rotation_rad, (x_vec, y_vec)
+        return isSegmented, targetCoor, rotation_rad
 
     # load image to define omega for motor controlling
     def img_cb(self, data):
         # self.dim = (101, 101)  # (width, height)
         self.count += 1
         self.pub_cam_tilt.publish(1.1)
-        if self.count == 2:
+        if self.count == 6:
             self.count = 0
             try:
                 # convert image_msg to cv format
@@ -377,13 +377,11 @@ class Lane_follow(object):
                 img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
                 #print("shape:", img.shape)
                 # PREDICT using segmentation apprach
-                isSegmented, targetCoor, rotation_rad, vec = self.segment(img)
-                vec_x, vec_y = vec[0], vec[1]
+                isSegmented, targetCoor, rotation_rad = self.segment(img)
                 img_BGR = cv2.putText(img_BGR, ".", (targetCoor[0], targetCoor[1]), cv2.FONT_HERSHEY_SIMPLEX, 4, (0,0,255), 2)
                 img_BGR = cv2.putText(img_BGR, str(rotation_rad), (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                img_BGR = cv2.putText(img_BGR, str(vec_x)+"; " + str(vec_y), (100, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255),2)
                 img_BGR = cv2.line(img_BGR, ((int)(img_BGR.shape[1]/2),(int)(img_BGR.shape[0])), targetCoor, (0,255,0))
-                #cv2.imwrite(os.path.join(os.getcwd(),str(self.idx))+".jpg",img_BGR)
+                cv2.imwrite(os.path.join(os.getcwd(),str(self.idx))+".jpg",img_BGR)
                 self.idx += 1
                 # PREDICT using deep learning approach
                 img = ImagePIL.fromarray(np.uint8(img))
@@ -421,13 +419,8 @@ class Lane_follow(object):
 
                 # motor control
                 car_cmd_msg = Twist()
-                cx = 2.5
-                if(abs(self.omega)>0.3 and abs(self.omega)<0.5):
-                    cx = 1.3
-                if(abs(self.omega)>=0.5):
-                    cx = 1
-                car_cmd_msg.linear.x = cx*0.123
-                car_cmd_msg.angular.z = self.omega * 0.8
+                car_cmd_msg.linear.x = 0.123
+                car_cmd_msg.angular.z = self.omega * 0.5
                 self.pub_car_cmd.publish(car_cmd_msg)
 
                 rospy.loginfo('\nomega: ' + str(self.omega) + '\ntop1: ' + str(top1) + '\nrot_rad:' + str(rotation_rad) + '\n---------')

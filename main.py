@@ -185,6 +185,7 @@ def main():
             vidcap = cv2.VideoCapture('./vid3.mp4')
             success, image = vidcap.read()
             count = 0
+            omega_list = [0,0,0,0]
             while success:
                 image = image.astype(np.uint8)
                 image_bgr= np.copy(image)
@@ -198,6 +199,9 @@ def main():
                 # print(count,"-class: ", prediction, ", omega: ", omega)
                 # START using segmentation approach and draw the results
                 isSegmented, targetCoor, rotation_rad = segment(image)
+                omega_list.append(rotation_rad)
+                omega_list.pop(0)
+                rotation_rad = (float)(sum(omega_list))/(float)(len(omega_list))
                 image_bgr = cv2.putText(image_bgr, ".", (targetCoor[0], targetCoor[1]),
                                         cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 2)
                 image_bgr = cv2.putText(image_bgr, str(rotation_rad), (100, 100),
