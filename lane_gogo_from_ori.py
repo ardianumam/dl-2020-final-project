@@ -266,6 +266,9 @@ class Lane_follow(object):
         self.omega_list = [0,0,0,0,0]
         self.count = 0
         self.input_img = np.zeros((480,640,3))
+
+        self.alpha = 0.8
+        self.speed = 0
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # self.data_transform = transforms.Compose([transforms.ToTensor()])
         size_downscale = (75, 100)
@@ -426,7 +429,10 @@ class Lane_follow(object):
                     cx = 1.3
                 if(abs(self.omega)>=0.5):
                     cx = 1
-                car_cmd_msg.linear.x = cx*0.123
+
+                ## speed smoothing
+                self.speed = self.alpha * self.speed + (1-self.alpha) * cx
+                car_cmd_msg.linear.x = self.speed * 0.123
                 car_cmd_msg.angular.z = self.omega * 0.8
                 self.pub_car_cmd.publish(car_cmd_msg)
 
@@ -440,5 +446,3 @@ if __name__ == "__main__":
     rospy.init_node("lane_follow", anonymous=False)
     lane_follow = Lane_follow()
     rospy.spin()
-
-
