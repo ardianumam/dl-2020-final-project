@@ -181,37 +181,53 @@ def main():
             print("Prediction pil: ", prediction_pil)
             # cv2.waitKey()
         elif(INPUT_TYPE == 'video'):
-            #vidcap = cv2.VideoCapture(0)
             vidcap = cv2.VideoCapture('./vid3.mp4')
+            SHOW = ['dl', 'improc', 'both'] #improc means image processing
+            SHOW = SHOW[2]
             success, image = vidcap.read()
             count = 0
-            omega_list = [0,0,0,0]
+            omega_dl_list = [0,0,0,0]; omega_seg_list = [0,0,0,0]
             while success:
                 image = image.astype(np.uint8)
                 image_bgr= np.copy(image)
+                image_bgr = cv2.putText(image_bgr, "Rotation prediction (radian).", (100, 80),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 1.8, (255, 0, 0), 3)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 img = Image.fromarray(np.uint8(image))
-                # prediction = infer(net, img)
-                # if(prediction != 18):
-                #     omega = omega_array[prediction]
-                # else:
-                #     omega = -999
-                # print(count,"-class: ", prediction, ", omega: ", omega)
-                # START using segmentation approach and draw the results
-                isSegmented, targetCoor, rotation_rad = segment(image)
-                omega_list.append(rotation_rad)
-                omega_list.pop(0)
-                rotation_rad = (float)(sum(omega_list))/(float)(len(omega_list))
-                image_bgr = cv2.putText(image_bgr, ".", (targetCoor[0], targetCoor[1]),
-                                        cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 2)
-                image_bgr = cv2.putText(image_bgr, str(rotation_rad), (100, 100),
-                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                image_bgr = cv2.line(image_bgr, ((int)(image.shape[1] / 2), (int)(image.shape[0])),
-                               targetCoor, (0, 255, 0))
-                # END using segmentation approach and draw the results
-
-                image_resize = cv2.resize(image_bgr, (640, 480), interpolation=cv2.INTER_AREA)
-                cv2.imshow("video", image_resize)
+                if(SHOW == 'dl' or SHOW == 'both'):
+                    prediction = infer(net, img)
+                    if(prediction != 18):
+                        omega = omega_array[prediction]
+                        y = (int)(image_bgr.shape[0]/2.0)
+                        x = (int)(image_bgr.shape[1]/2.0) - (int)(y*np.arctan(omega))
+                        targetCoor = (x, y)
+                    else:
+                        omega = 0 #invalid (no robot route in the scene)
+                        targetCoor = (0,0)
+                    omega_dl_list.append(omega)
+                    omega_dl_list.pop(0)
+                    rotation_rad = (float)(sum(omega_dl_list)) / (float)(len(omega_dl_list))
+                    image_bgr = cv2.putText(image_bgr, ".", (targetCoor[0], targetCoor[1]),
+                                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 12)
+                    image_bgr = cv2.putText(image_bgr, "DL: " + str(rotation_rad), (130, 140),
+                                         cv2.FONT_HERSHEY_SIMPLEX, 1.7, (0, 0, 255), 3)
+                    image_bgr = cv2.line(image_bgr, ((int)(image.shape[1] / 2), (int)(image.shape[0])),
+                                      targetCoor, (0, 0, 255),3)
+                if(SHOW == 'improc' or SHOW == 'both'):
+                    # START using segmentation approach and draw the results
+                    isSegmented, targetCoor, rotation_rad = segment(image)
+                    omega_seg_list.append(rotation_rad)
+                    omega_seg_list.pop(0)
+                    rotation_rad = (float)(sum(omega_seg_list))/(float)(len(omega_seg_list))
+                    image_bgr = cv2.putText(image_bgr, ".", (targetCoor[0], targetCoor[1]),
+                                          cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 12)
+                    image_bgr = cv2.putText(image_bgr, "Improc.: " + str(np.around(rotation_rad, decimals=4)),
+                                            (130, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.7, (0, 255, 0), 3)
+                    image_bgr = cv2.line(image_bgr, ((int)(image.shape[1] / 2), (int)(image.shape[0])),
+                                       targetCoor, (0, 255, 0),3)
+                    # END using segmentation approach and draw the results
+                    img_seg_resize = cv2.resize(image_bgr, (640, 480), interpolation=cv2.INTER_AREA)
+                cv2.imshow("Prediction result", img_seg_resize)
                 count += 1
                 success, image = vidcap.read()
                 if cv2.waitKey(1) == 27:
@@ -446,9 +462,9 @@ def segment(img):
                     max_area = areas[i]
             targetCoor = ((int)(centroids[max_label][0]),(int)(center[1]))
             #calculate the rotation degree
-            x_vec = (img.shape[1]/2)-targetCoor[0]
-            y_vec = img.shape[0]-targetCoor[1]
-            rotation_rad = np.arctan(x_vec/y_vec)
+            x_vec = (float)((img.shape[1]/2)-targetCoor[0])
+            y_vec = (float)(img.shape[0]-targetCoor[1])
+            rotation_rad = (float)(np.arctan(x_vec/y_vec))
 
     return isSegmented, targetCoor, rotation_rad
 

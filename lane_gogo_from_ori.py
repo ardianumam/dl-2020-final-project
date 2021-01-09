@@ -422,10 +422,10 @@ class Lane_follow(object):
                 # motor control
                 car_cmd_msg = Twist()
                 cx = 2.5
-                if(abs(self.omega)>0.3 and abs(self.omega)<0.5):
-                    cx = 1.3
                 if(abs(self.omega)>=0.5):
                     cx = 1
+                elif(abs(self.omega >= 0.3)):
+                    cx = 1.3
                 car_cmd_msg.linear.x = cx*0.123
                 car_cmd_msg.angular.z = self.omega * 0.8
                 self.pub_car_cmd.publish(car_cmd_msg)
