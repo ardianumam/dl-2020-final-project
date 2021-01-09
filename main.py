@@ -226,8 +226,8 @@ def main():
                     image_bgr = cv2.line(image_bgr, ((int)(image.shape[1] / 2), (int)(image.shape[0])),
                                        targetCoor, (0, 255, 0),3)
                     # END using segmentation approach and draw the results
-                    img_seg_resize = cv2.resize(image_bgr, (640, 480), interpolation=cv2.INTER_AREA)
-                cv2.imshow("Prediction result", img_seg_resize)
+                image_bgr = cv2.resize(image_bgr, (640, 480))
+                cv2.imshow("Prediction result", image_bgr)
                 count += 1
                 success, image = vidcap.read()
                 if cv2.waitKey(1) == 27:
@@ -423,12 +423,12 @@ def segment(img):
     mask2 = cv2.inRange(img_hsv, lower_yelllow, upper_yellow)
     mask = mask1 + mask2
 
-    kernel = np.ones((20, 20))
+    kernel = np.ones((40, 40))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     kernel = np.ones((10, 10))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    # cv2.imshow("mask", mask)
-    # cv2.waitKey()
+    mask_resize = cv2.resize(mask, (640, 480))
+    cv2.imshow("Segmentation mask", mask_resize)
     image = mask.astype('uint8')
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=4)
 
