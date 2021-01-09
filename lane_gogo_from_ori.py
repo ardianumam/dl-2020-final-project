@@ -266,6 +266,9 @@ class Lane_follow(object):
         self.omega_list = [0,0,0,0,0]
         self.count = 0
         self.input_img = np.zeros((480,640,3))
+
+        self.alpha = 0.8
+        self.speed = 0
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # self.data_transform = transforms.Compose([transforms.ToTensor()])
         size_downscale = (75, 100)
@@ -440,5 +443,3 @@ if __name__ == "__main__":
     rospy.init_node("lane_follow", anonymous=False)
     lane_follow = Lane_follow()
     rospy.spin()
-
-
