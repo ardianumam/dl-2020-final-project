@@ -13,7 +13,7 @@ This project adopted traditional computer vision techniques in OpenCV.
 // add the mass center and angle computation here
 
 # Demonstration
-// prediction results and videos
+[Video demo on YouTube](https://youtu.be/mLA47WiJ1KA)
 
 # Team Members
 Ardian Umam, Po-Yuan Jeng, Shih-Wei Chiu, and Jeng-Jung Chen.
