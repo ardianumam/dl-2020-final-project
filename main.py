@@ -34,7 +34,7 @@ N_EPOCH = 200
 MODE = ['train', 'infer']
 MODE = MODE[1] #set 0 for train mode, and 1 for infer mode
 
-RESUMED_MODEL = 'model/mobilenet_v2_epoch-112.pt' # path of model you wanna resume
+RESUMED_MODEL = './mobilenet_v2_epoch-122.pt' # path of model you wanna resume
 IS_RESUMED = True # change to True to resume the model training, vice versa
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
