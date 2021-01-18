@@ -1,14 +1,12 @@
 #! /usr/bin/env python
 
-import torch
+import torch, os
 import torch.nn as nn
 from torchvision import datasets ,models,transforms
-from matplotlib import pyplot as plt
 import numpy as np
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
-import torchvision, os
 from PIL import Image
 from mobilenet_v2 import MobileNet2
 import time, cv2
@@ -34,7 +32,7 @@ NETWORK = ['alexnet',
 NETWORK = NETWORK[1]
 N_EPOCH = 200
 MODE = ['train', 'infer']
-MODE = MODE[1]
+MODE = MODE[1] #set 0 for train mode, and 1 for infer mode
 
 RESUMED_MODEL = 'model/mobilenet_v2_epoch-112.pt' # path of model you wanna resume
 IS_RESUMED = True # change to True to resume the model training, vice versa
@@ -188,6 +186,7 @@ def main():
             count = 0
             omega_dl_list = [0,0,0,0]; omega_seg_list = [0,0,0,0]
             while success:
+                image = cv2.resize(image, (1920, 1080))
                 image = image.astype(np.uint8)
                 image_bgr= np.copy(image)
                 image_bgr = cv2.putText(image_bgr, "Rotation prediction (radian).", (100, 80),
