@@ -23,6 +23,8 @@ The details of the method are presented in [this video](https://youtu.be/ocecK87
 
 
 # Demonstration
+![lane following](img/lane_following.gif)
+
 1. Video demo 1, [click here](https://youtu.be/gqOzMLZzDCs).
 2. Video demo 2 (with faster speed), [click here](https://youtu.be/mLA47WiJ1KA).
 
