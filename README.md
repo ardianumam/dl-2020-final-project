@@ -4,15 +4,27 @@ This is the final project for the Deep Learning class lectured by professor Chia
 ![lane detection](img/lane_detection.gif)
 
 
-
 # Method
-This project adopted traditional image processing approach, which is image segmentation via HSV image. There are three general steps: (a) segmenting the line track and calculating the mass center, (b) renewing the *x axis* and (c) calculating the rotation degree. The detailed method is explained in [this video](https://www.youtube.com/watch?v=ocecK87CQw4&list=PLkRkKTC6HZMzyHF8a0tyQuF15H0A4IKVO&ab_channel=ArdianUmam).
+This project adopts a traditional image processing approach, which is the image segmentation via HSV image. The input of the robot is a sequence of images captured by its front camera. The lane to follow is composed of yellow and blue lines and the floor is basically all-wooden texture. This method aims at identifying the lane from the image and calculating the cursing direction based on the lane segment. 
+
+The method consists of three steps: 
+
+
+1. Obtain the center of the lane: Mask out the pixels of the background and calculate the geographical center of the lane. 
+
+1. Center adjustment: The calculated center point might not be inside the lane. Following this direction could lead to lane departure. Hence, the center point is horizontally adjusted in this step.
+
+
+1. Steering angle calculation: The degree between the center point of the lane and the robot is calculated this step.
+
+The details of the method are presented in [this video](https://youtu.be/ocecK87CQw4).
+
 ![lane detection](img/method.JPG)
 
 
 # Demonstration
-1. Video demo 1, [click here](https://www.youtube.com/watch?v=gqOzMLZzDCs&list=PLkRkKTC6HZMzyHF8a0tyQuF15H0A4IKVO&index=2&ab_channel=ArdianUmam)<br>
-2. Video demo 2 (with faster speed), [click here](https://youtu.be/mLA47WiJ1KA)
+1. Video demo 1, [click here](https://youtu.be/gqOzMLZzDCs).
+2. Video demo 2 (with faster speed), [click here](https://youtu.be/mLA47WiJ1KA).
 
 # Code and Dataset
 1. To train and test (infer) the model/algorithm, use `main.py`.
