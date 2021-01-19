@@ -41,6 +41,8 @@ IS_RESUMED = True # change to True to resume the model training, vice versa
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 size_downscale = (75, 100) #
+videoWriter_pred = cv2.VideoWriter('prediction.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 24, (640, 480))
+videoWriter_segment = cv2.VideoWriter('segmentation.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 24, (640, 480), isColor=False)
 
 def main():
     global size_downscale, TRAIN_DIR, TEST_DIR
@@ -160,7 +162,7 @@ def main():
         MODEL_PATH = "./mobilenet_v2_epoch-122.pt"
         time0 = time.time()
         net = MobileNet2(input_size=100, num_classes=18).to(DEVICE)
-        checkpoint = torch.load(MODEL_PATH)
+        checkpoint = torch.load(MODEL_PATH, map_location=DEVICE)
         net.load_state_dict(checkpoint['model_state_dict'])
         print("Load model time:", time.time()-time0)
         INPUT_TYPE = ['image', 'video', 'manual_test', 'auto_test', 'new_data_test']
@@ -183,8 +185,10 @@ def main():
         elif(INPUT_TYPE == 'video'):
             vidcap = cv2.VideoCapture('./vid3.mp4')
             SHOW = ['dl', 'improc', 'both'] #improc means image processing
-            SHOW = SHOW[2]
+            SHOW = SHOW[1]
             success, image = vidcap.read()
+
+
             count = 0
             omega_dl_list = [0,0,0,0]; omega_seg_list = [0,0,0,0]
             while success:
@@ -227,7 +231,9 @@ def main():
                                        targetCoor, (0, 255, 0),3)
                     # END using segmentation approach and draw the results
                 image_bgr = cv2.resize(image_bgr, (640, 480))
+                print(image_bgr.shape)
                 cv2.imshow("Prediction result", image_bgr)
+                videoWriter_pred.write(image_bgr)
                 count += 1
                 success, image = vidcap.read()
                 if cv2.waitKey(1) == 27:
@@ -429,6 +435,8 @@ def segment(img):
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask_resize = cv2.resize(mask, (640, 480))
     cv2.imshow("Segmentation mask", mask_resize)
+    print(mask_resize.shape)
+    videoWriter_segment.write(mask_resize)
     image = mask.astype('uint8')
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=4)
 
