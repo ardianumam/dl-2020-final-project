@@ -5,17 +5,17 @@ This is the final project for the Deep Learning class lectured by professor Chia
 
 
 # Method
-This project adopts a traditional image processing approach, which is the image segmentation via HSV image. The input of the robot is a sequence of images captured by its front camera. The lane to follow is composed of yellow and blue lines and the floor is basically all-wooden texture. This method aims at identifying the lane from the image and calculating the cursing direction based on the lane segment. 
+This project adopts a traditional image processing approach, which is the image segmentation via HSV image. The input of the robot is a sequence of images captured by its front camera. The line track to follow is composed of yellow and blue lines and the floor is basically all-wooden texture. This method aims at identifying the line track from the image and calculating the cursing direction based on the line segment. 
 
 The method consists of three steps: 
 
 
-1. Obtain the center of the lane: Mask out the pixels of the background and calculate the geographical center of the lane. 
+1. Obtain the center of the line track: Mask out the pixels of the background and calculate the geographical center of the line track. 
 
-1. Center adjustment: The calculated center point might not be inside the lane. Following this direction could lead to lane departure. Hence, the center point is horizontally adjusted in this step.
+1. Center adjustment: The calculated center point might not be inside the line track. Following this direction could lead to line track departure. Hence, the center point is horizontally adjusted in this step.
 
 
-1. Steering angle calculation: The degree between the center point of the lane and the robot is calculated this step.
+1. Steering angle calculation: The degree between the center point of the line track and the robot is calculated this step.
 
 The details of the method are presented in [this video](https://youtu.be/ocecK87CQw4).
 
@@ -30,7 +30,7 @@ The details of the method are presented in [this video](https://youtu.be/ocecK87
 
 # Code and Dataset
 1. To train and test (infer) the model/algorithm, use `main.py`.
-2. To run the robot, use `lane_gogo_from_ori.py`.
+2. To run the robot, use `line_gogo_from_ori.py`.
 3. The dataset can be downloaded [here](https://drive.google.com/drive/folders/1zioCeK1OlrUGLt47aBFgAOjNNyN-MEF6?usp=sharing).
 
 
